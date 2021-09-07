@@ -95,6 +95,7 @@ int main(int argc, char **argv)
 
 
         if (count<200){
+
            pose.pose.position.x = 3;
            pose.pose.position.y = 0;
            pose.pose.position.z = 6;
@@ -104,8 +105,11 @@ int main(int argc, char **argv)
            pose.pose.position.y = 0;
            pose.pose.position.z = 6;
         }
-	else{
-	count=0;
+	    else{
+	        count=0;
+	        ROS_INFO_STREAM("repeat");
+	        ROS_INFO("repeat2");
+
         }
 
         //float phase = ((float)count/40);
