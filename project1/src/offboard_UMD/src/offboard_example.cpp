@@ -2,7 +2,7 @@
  * @file offb_node.cpp
  * @brief Offboard control example node, written with MAVROS version 0.19.x, PX4 Pro Flight
  * Stack and tested in Gazebo SITL
- * 
+ *
  * from https://docs.px4.io/master/en/ros/mavros_offboard.html
  */
 
@@ -59,7 +59,7 @@ int main(int argc, char **argv)
     }
 
 
-   
+
     //pose_vel.coordinate_frame = pose_vel.FRAME_LOCAL_NED;
     //pose_vel.type_mask =  pose_vel.IGNORE_AFX | pose_vel.IGNORE_AFY | pose_vel.IGNORE_AFZ | pose_vel.FORCE | pose_vel.IGNORE_YAW | pose_vel.IGNORE_PX | pose_vel.IGNORE_PY | pose_vel.IGNORE_PZ;
 
@@ -75,24 +75,24 @@ int main(int argc, char **argv)
     int count = 0;
 
     while(ros::ok()){
-        //if( current_state.mode != "OFFBOARD" &&
-        //    (ros::Time::now() - last_request > ros::Duration(5.0))){
-        //    if( set_mode_client.call(offb_set_mode) &&
-        //        offb_set_mode.response.mode_sent){
-        //        ROS_INFO("Offboard enabled");
-        //    }
-        //    last_request = ros::Time::now();
-        //} else {
-        //    if( !current_state.armed &&
-        //        (ros::Time::now() - last_request > ros::Duration(5.0))){
-        //        if( arming_client.call(arm_cmd) &&
-        //            arm_cmd.response.success){
-        //            ROS_INFO("Vehicle armed");
-        //        }
-        //       last_request = ros::Time::now();
-        //    }
-        //}
-        
+        if( current_state.mode != "OFFBOARD" &&
+            (ros::Time::now() - last_request > ros::Duration(5.0))){
+            if( set_mode_client.call(offb_set_mode) &&
+                offb_set_mode.response.mode_sent){
+                ROS_INFO("Offboard enabled");
+            }
+            last_request = ros::Time::now();
+        } else {
+            if( !current_state.armed &&
+                (ros::Time::now() - last_request > ros::Duration(5.0))){
+                if( arming_client.call(arm_cmd) &&
+                    arm_cmd.response.success){
+                    ROS_INFO("Vehicle armed");
+                }
+                last_request = ros::Time::now();
+            }
+        }
+
 
         if (count<200){
            pose.pose.position.x = 3;
@@ -107,14 +107,14 @@ int main(int argc, char **argv)
 	else{
 	count=0;
         }
-      
+
         //float phase = ((float)count/40);
         //pose_vel.header.stamp = ros::Time::now();
         //pose_vel.yaw_rate = 0;
         //pose_vel.velocity.x = 1.5*sin(phase);
-        //pose_vel.velocity.y = 0; 
+        //pose_vel.velocity.y = 0;
         //pose_vel.velocity.z = 0;
-    
+
         //local_pos_pub_mavros.publish(pose_vel);
 
         local_pos_pub.publish(pose);
