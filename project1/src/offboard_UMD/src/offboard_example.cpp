@@ -15,6 +15,8 @@
 #include <mavros_msgs/CommandBool.h>
 #include <mavros_msgs/GlobalPositionTarget.h>
 
+int FREQ = 10;
+
 mavros_msgs::State current_state;
 mavros_msgs::PositionTarget pose_vel;
 
@@ -49,7 +51,7 @@ int main(int argc, char **argv)
     geometry_msgs::PoseStamped pose;
     pose.pose.position.x = 0;
     pose.pose.position.y = 0;
-    pose.pose.position.z = 6;
+    pose.pose.position.z = 10;
 
     //send a few setpoints before starting
     for(int i = 200; ros::ok() && i > 0; --i){
@@ -96,14 +98,23 @@ int main(int argc, char **argv)
 
         if (count<200){
 
-           pose.pose.position.x = 3;
-           pose.pose.position.y = 0;
-           pose.pose.position.z = 6;
+           pose.pose.position.x = 0;
+           pose.pose.position.y = 10;
+           pose.pose.position.z = 10;
         }
         else if (count<400){
-           pose.pose.position.x = -3;
+           pose.pose.position.x = 0;
+           pose.pose.position.y = 10;
+           pose.pose.position.z = 25;
+        }
+        else if (count<600){
+           pose.pose.position.x = -5;
+           pose.pose.position.y = 10;
+           pose.pose.position.z = 25;
+        }  else if (count<800){
+           pose.pose.position.x = 0;
            pose.pose.position.y = 0;
-           pose.pose.position.z = 6;
+           pose.pose.position.z = 10;
         }
 	    else{
 	        count=0;
