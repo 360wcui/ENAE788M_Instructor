@@ -75,7 +75,7 @@ int main(int argc, char **argv)
     ros::Time last_request = ros::Time::now();
 
     int count = 0;
-
+    ROS_INFO("haha45dd5");
     while(ros::ok()){
         if( current_state.mode != "OFFBOARD" &&
             (ros::Time::now() - last_request > ros::Duration(5.0))){
