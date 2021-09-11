@@ -85,15 +85,18 @@ int main(int argc, char **argv)
             }
             last_request = ros::Time::now();
         } else {
+            ROS_INFO("trying to arm %d,  %.3f, %.3f, %.3f", current_state.armed, ros::Time::now() - last_request, last_request, ros::Time::now());
+            ROS_INFO_STREAM(current_state.armed);
             if( !current_state.armed &&
                 (ros::Time::now() - last_request > ros::Duration(5.0))){
+                ROS_INFO("trying to arm call2");
                 if( arming_client.call(arm_cmd) &&
                     arm_cmd.response.success){
                     ROS_INFO("Vehicle armed");
                 }
                 last_request = ros::Time::now();
             }
-        }	
+        }
 
         if (count<200){
 
