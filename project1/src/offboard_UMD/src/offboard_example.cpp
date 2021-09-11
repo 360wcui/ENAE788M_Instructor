@@ -14,14 +14,25 @@
 #include <mavros_msgs/PositionTarget.h>
 #include <mavros_msgs/CommandBool.h>
 #include <mavros_msgs/GlobalPositionTarget.h>
+#include <nav_msgs/Odometry.h>
 
 int FREQ = 10;
 
 mavros_msgs::State current_state;
+nav_msgs::Odometry current_pose;
 mavros_msgs::PositionTarget pose_vel;
 
 void state_cb(const mavros_msgs::State::ConstPtr& msg){
     current_state = *msg;
+}
+
+void pose_cb(const nav_msgs::Odometry::ConstPtr& msg){
+    current_pose = *msg;
+    ROS_INFO("xx: %f",msg->pose.pose.position.x);
+    ROS_INFO("yy: %f",msg->pose.pose.position.y);
+    ROS_INFO("zz: %f",msg->pose.pose.position.z);
+    //        ROS_INFO("y: %f",current_pose.pose.pose.position.y);
+    //        ROS_INFO("z: %f",current_pose.pose.pose.position.z);
 }
 
 int main(int argc, char **argv)
@@ -31,6 +42,9 @@ int main(int argc, char **argv)
 
     ros::Subscriber state_sub = nh.subscribe<mavros_msgs::State>
             ("mavros/state", 10, state_cb);
+
+    ros::Subscriber pose_sub = nh.subscribe("odom", 1000, pose_cb);
+
     ros::Publisher local_pos_pub = nh.advertise<geometry_msgs::PoseStamped>
             ("mavros/setpoint_position/local", 10);
     ros::ServiceClient arming_client = nh.serviceClient<mavros_msgs::CommandBool>
@@ -86,7 +100,6 @@ int main(int argc, char **argv)
             last_request = ros::Time::now();
         } else {
 //            ROS_INFO("trying to arm %d,  %.3f, %.3f, %.3f", current_state.armed, ros::Time::now() - last_request, last_request, ros::Time::now());
-            ROS_INFO_STREAM(current_state.armed);
             if( !current_state.armed &&
                 (ros::Time::now() - last_request > ros::Duration(5.0))){
 //                ROS_INFO("trying to arm call2");
@@ -97,9 +110,11 @@ int main(int argc, char **argv)
                 last_request = ros::Time::now();
             }
         }
-
+        // ROS_INFO("x: %f",current_pose.pose.pose.);
+         ROS_INFO("y: %f",current_pose.pose.pose.position.y);
+         ROS_INFO("z: %f",current_pose.pose.pose.position.z);
         if (count<200){
-
+//           ROS_INFO(current_state.MODE_APM_COPTER_POSITION);
            pose.pose.position.x = 0;
            pose.pose.position.y = 10;
            pose.pose.position.z = 10;
