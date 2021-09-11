@@ -19,18 +19,18 @@
 int FREQ = 10;
 
 mavros_msgs::State current_state;
-nav_msgs::Odometry current_pose;
+geometry_msgs::PoseStamped current_pose;
 mavros_msgs::PositionTarget pose_vel;
 
 void state_cb(const mavros_msgs::State::ConstPtr& msg){
     current_state = *msg;
 }
 
-void pose_cb(const nav_msgs::Odometry::ConstPtr& msg){
+void pose_cb(const geometry_msgs::PoseStamped::ConstPtr& msg){
     current_pose = *msg;
-    ROS_INFO("xx: %f",msg->pose.pose.position.x);
-    ROS_INFO("yy: %f",msg->pose.pose.position.y);
-    ROS_INFO("zz: %f",msg->pose.pose.position.z);
+//    ROS_INFO("xx: %f",msg->pose.position.x);
+//    ROS_INFO("yy: %f",msg->pose.pose.position.y);
+//    ROS_INFO("zz: %f",msg->pose.pose.position.z);
     //        ROS_INFO("y: %f",current_pose.pose.pose.position.y);
     //        ROS_INFO("z: %f",current_pose.pose.pose.position.z);
 }
@@ -43,7 +43,7 @@ int main(int argc, char **argv)
     ros::Subscriber state_sub = nh.subscribe<mavros_msgs::State>
             ("mavros/state", 10, state_cb);
 
-    ros::Subscriber pose_sub = nh.subscribe("odom", 1000, pose_cb);
+    ros::Subscriber pose_sub = nh.subscribe("mavros/local_position/pose", 1000, pose_cb);
 
     ros::Publisher local_pos_pub = nh.advertise<geometry_msgs::PoseStamped>
             ("mavros/setpoint_position/local", 10);
@@ -111,8 +111,8 @@ int main(int argc, char **argv)
             }
         }
         // ROS_INFO("x: %f",current_pose.pose.pose.);
-         ROS_INFO("y: %f",current_pose.pose.pose.position.y);
-         ROS_INFO("z: %f",current_pose.pose.pose.position.z);
+         std::cout << "y " << current_pose.pose.position << std::endl;
+//         ROS_INFO("z " << current_pose.pose.pose.position.z);
         if (count<200){
 //           ROS_INFO(current_state.MODE_APM_COPTER_POSITION);
            pose.pose.position.x = 0;
