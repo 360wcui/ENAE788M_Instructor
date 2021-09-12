@@ -46,6 +46,25 @@ geometry_msgs::Point createTarget(int x, int y, int z) {
 
 }
 
+geometry_msgs::Point foo(geometry_msgs::Point current_position, geometry_msgs::Point target, int* count, bool* reachedTarget, ros::Time* target_reached_time) {
+    geometry_msgs::Point next_position;
+    next_position = target;
+
+    if (closeEnough(current_position, target)){
+        if (!*reachedTarget) {
+            *reachedTarget = true;
+            *target_reached_time = ros::Time::now();
+            ROS_INFO("step %d target reached.", *count);
+
+        } else if (ros::Time::now() - *target_reached_time > ros::Duration(1.5)) {
+            ROS_INFO("step %d complete.", *count);
+            std::cout << "current posiiton " << current_position << std::endl;
+            *reachedTarget = false;
+            *count = (*count + 1) % 4;
+        }
+     }
+     return next_position;
+}
 
 int main(int argc, char **argv)
 {
@@ -91,12 +110,6 @@ int main(int argc, char **argv)
         rate.sleep();
     }
 
-
-
-    //pose_vel.coordinate_frame = pose_vel.FRAME_LOCAL_NED;
-    //pose_vel.type_mask =  pose_vel.IGNORE_AFX | pose_vel.IGNORE_AFY | pose_vel.IGNORE_AFZ | pose_vel.FORCE | pose_vel.IGNORE_YAW | pose_vel.IGNORE_PX | pose_vel.IGNORE_PY | pose_vel.IGNORE_PZ;
-
-
     mavros_msgs::SetMode offb_set_mode;
     offb_set_mode.request.custom_mode = "OFFBOARD";
 
@@ -105,6 +118,7 @@ int main(int argc, char **argv)
 
     ros::Time last_request = ros::Time::now();
     ros::Time target_reached_time = ros::Time::now();
+    bool reachedTarget = false;
 
     int count = 0;
     ROS_INFO("athena takes off");
@@ -130,74 +144,22 @@ int main(int argc, char **argv)
         }
 
         if (current_state.armed) {
-            bool reachedTarget = false;
-             if (count == 0){
-                if (!closeEnough(current_pose.pose.position, target0)){
-                    pose.pose.position = target0;
-                 } else{
-                    ROS_INFO("step0 complete.");
-                     std::cout << "current pose " << current_pose.pose.position << std::endl;
-                    count = 1;
-                 }
-            }
-//
-//            if (count == 0) {
-//                if (!closeEnough(current_pose.pose.position, target0)){
-//                    pose.pose.position = target0;
-//                 } else{
-//                    if (!reachedTarget) {
-//                        reachedTarget = true;
-//                        target_reached_time = ros::Time::now();
-//                        ROS_INFO("step0 target reached.");
-//                        pose.pose.position = target0;
-//                    } else if (ros::Time::now() - last_request > ros::Duration(1.0)) {
-//                        ROS_INFO("step0 complete.");
-//                        std::cout << "current pose " << current_pose.pose.position << std::endl;
-//                        reachedTarget = false;
-//                        count = 1;
-//                    }
-//                 }
-//            }
 
-            if (count == 1){
-                if (!closeEnough(current_pose.pose.position, target1)){
-                    pose.pose.position = target1;
-                 } else{
-                    ROS_INFO("step1 complete.");
-                     std::cout << "current pose " << current_pose.pose.position << std::endl;
-                    count = 2;
-                 }
+            if (count == 0) {
+                pose.pose.position = foo(current_pose.pose.position, target0, &count, &reachedTarget, &target_reached_time);
             }
 
-            if (count == 2){
-                if (!closeEnough(current_pose.pose.position, target2)){
-                    pose.pose.position = target2;
-                 } else{
-                    ROS_INFO("step2 complete.");
-                     std::cout << "current pose " << current_pose.pose.position << std::endl;
-                    count = 3;
-                 }
+            if (count == 1) {
+                pose.pose.position = foo(current_pose.pose.position, target1, &count, &reachedTarget, &target_reached_time);
             }
 
-            if (count == 3){
-                if (!closeEnough(current_pose.pose.position, target3)){
-                    pose.pose.position = target3;
-                 } else{
-                    ROS_INFO("step3 complete. repeat.");
-                     std::cout << "current pose " << current_pose.pose.position << std::endl;
-                    count = 0;
-                 }
+            if (count == 2) {
+                pose.pose.position = foo(current_pose.pose.position, target2, &count, &reachedTarget, &target_reached_time);
             }
 
-
-            //float phase = ((float)count/40);
-            //pose_vel.header.stamp = ros::Time::now();
-            //pose_vel.yaw_rate = 0;
-            //pose_vel.velocity.x = 1.5*sin(phase);
-            //pose_vel.velocity.y = 0;
-            //pose_vel.velocity.z = 0;
-
-            //local_pos_pub_mavros.publish(pose_vel);
+            if (count == 3) {
+                pose.pose.position = foo(current_pose.pose.position, target3, &count, &reachedTarget, &target_reached_time);
+            }
 
             local_pos_pub.publish(pose);
         }
