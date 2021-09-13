@@ -19,7 +19,7 @@
 #include <nav_msgs/Odometry.h>
 #include <cmath>
 
-int FREQ = 10;
+#define FREQ 20.0
 
 mavros_msgs::State current_state;
 geometry_msgs::PoseStamped current_pose;
@@ -85,7 +85,7 @@ int main(int argc, char **argv)
     ros::Publisher local_pos_pub_mavros = nh.advertise<mavros_msgs::PositionTarget>("mavros/setpoint_raw/local", 5);
 
     //the setpoint publishing rate MUST be faster than 2Hz
-    ros::Rate rate(20.0);
+    ros::Rate rate(FREQ);
 
     // wait for FCU connection
     while(ros::ok() && !current_state.connected){
