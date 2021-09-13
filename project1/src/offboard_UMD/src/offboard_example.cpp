@@ -143,7 +143,7 @@ int main(int argc, char **argv)
             }
         }
 
-        if (current_state.armed) {
+//        if (current_state.armed) {
 
             if (count == 0) {
                 pose.pose.position = foo(current_pose.pose.position, target0, &count, &reachedTarget, &target_reached_time);
@@ -162,7 +162,7 @@ int main(int argc, char **argv)
             }
 
             local_pos_pub.publish(pose);
-        }
+//        }
 
         ros::spinOnce();
         rate.sleep();
