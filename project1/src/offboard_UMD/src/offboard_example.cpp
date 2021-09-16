@@ -20,6 +20,9 @@
 #include <cmath>
 
 #define FREQ 20.0
+#define EPS 0.01
+#define DURATION 1.0
+#define ENABLE_ARM_DURATION 1.0
 
 mavros_msgs::State current_state;
 geometry_msgs::PoseStamped current_pose;
@@ -34,7 +37,7 @@ void pose_cb(const geometry_msgs::PoseStamped::ConstPtr& msg){
 }
 
 bool closeEnough(geometry_msgs::Point current, geometry_msgs::Point target) {
-    return abs(current.x - target.x) < 0.01 && abs(current.y - target.y) < 0.01 && abs(current.z - target.z) < 0.01;
+    return abs(current.x - target.x) < EPS && abs(current.y - target.y) < EPS && abs(current.z - target.z) < EPS;
 }
 
 geometry_msgs::Point createTarget(int x, int y, int z) {
@@ -55,8 +58,9 @@ geometry_msgs::Point foo(geometry_msgs::Point current_position, geometry_msgs::P
             *reachedTarget = true;
             *target_reached_time = ros::Time::now();
             ROS_INFO("step %d target reached.", *count);
-
-        } else if (ros::Time::now() - *target_reached_time > ros::Duration(1.5)) {
+            std::cout <<  *target_reached_time << std::endl;
+        } else if (ros::Time::now() - *target_reached_time > ros::Duration(DURATION)) {
+            std::cout << ros::Time::now() << " last time" << *target_reached_time << std::endl;
             ROS_INFO("step %d complete.", *count);
             std::cout << "current posiiton " << current_position << std::endl;
             *reachedTarget = false;
@@ -124,14 +128,13 @@ int main(int argc, char **argv)
     ROS_INFO("athena takes off");
     while(ros::ok()){
         if( current_state.mode != "OFFBOARD" &&
-            (ros::Time::now() - last_request > ros::Duration(5.0))){
+            (ros::Time::now() - last_request > ros::Duration(1.0))){
             if( set_mode_client.call(offb_set_mode) &&
                 offb_set_mode.response.mode_sent){
                 ROS_INFO("Offboard enabled");
             }
             last_request = ros::Time::now();
         } else {
-//            ROS_INFO("trying to arm %d,  %.3f, %.3f, %.3f", current_state.armed, ros::Time::now() - last_request, last_request, ros::Time::now());
             if( !current_state.armed &&
                 (ros::Time::now() - last_request > ros::Duration(5.0))){
 //                ROS_INFO("trying to arm call2");
@@ -143,30 +146,26 @@ int main(int argc, char **argv)
             }
         }
 
-//        if (current_state.armed) {
+        if (count == 0) {
+            pose.pose.position = foo(current_pose.pose.position, target0, &count, &reachedTarget, &target_reached_time);
+        }
 
-            if (count == 0) {
-                pose.pose.position = foo(current_pose.pose.position, target0, &count, &reachedTarget, &target_reached_time);
-            }
+        if (count == 1) {
+            pose.pose.position = foo(current_pose.pose.position, target1, &count, &reachedTarget, &target_reached_time);
+        }
 
-            if (count == 1) {
-                pose.pose.position = foo(current_pose.pose.position, target1, &count, &reachedTarget, &target_reached_time);
-            }
+        if (count == 2) {
+            pose.pose.position = foo(current_pose.pose.position, target2, &count, &reachedTarget, &target_reached_time);
+        }
 
-            if (count == 2) {
-                pose.pose.position = foo(current_pose.pose.position, target2, &count, &reachedTarget, &target_reached_time);
-            }
+        if (count == 3) {
+            pose.pose.position = foo(current_pose.pose.position, target3, &count, &reachedTarget, &target_reached_time);
+        }
 
-            if (count == 3) {
-                pose.pose.position = foo(current_pose.pose.position, target3, &count, &reachedTarget, &target_reached_time);
-            }
-
-            local_pos_pub.publish(pose);
-//        }
+        local_pos_pub.publish(pose);
 
         ros::spinOnce();
         rate.sleep();
-//        count++;
     }
 
     return 0;
