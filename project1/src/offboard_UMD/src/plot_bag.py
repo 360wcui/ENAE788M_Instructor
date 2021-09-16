@@ -10,6 +10,31 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
+def plot_bb2(x_positions, y_positions, z_positions, freq, filename):
+    fig_no = 1
+    # for symbol in symbols:
+    plt.figure(fig_no)
+    # filename = "x_position.jpg"
+    num_samples = len(x_positions)
+    total_time_elapsed = num_samples / freq
+    print(total_time_elapsed, num_samples)
+    seconds = np.linspace(0, total_time_elapsed, num_samples)
+    plt.plot(seconds, x_positions)
+    plt.plot(seconds, y_positions)
+    plt.plot(seconds, z_positions)
+    plt.title('Transient Analysis')
+    plt.xlabel("Time(s)")
+    plt.ylabel("Distance(m)")
+    # plt.xlim([start_date, end_date])
+    plt.xticks(rotation=30)
+    # plt.plot(rolling_prices_mean[symbol])
+    # plt.plot(upper_bound[symbol])
+    # plt.plot(lower_bound[symbol])
+    plt.legend(['x positions', 'y positions', 'z positions'])
+
+    plt.savefig(filename)
+    # plt.close()
+
 def plot_bb(positions, freq, title, filename):
     # fig_no = 1
     # for symbol in symbols:
@@ -63,9 +88,9 @@ def main():
         z_positions.append(positions.z)
     bag.close()
 
-    plot_bb(positions=x_positions, freq=20.0, title="X Positions", filename="x_position.jpg")
-    plot_bb(positions=y_positions, freq=20.0, title="Y Positions", filename="y_position.jpg")
-    plot_bb(positions=z_positions, freq=20.0, title="Z Positions", filename="z_position.jpg")
+    plot_bb2(x_positions=x_positions, y_positions=y_positions, z_positions=z_positions, freq=20.0, filename="response.jpg")
+    # plot_bb(positions=y_positions, freq=20.0, title="Y Positions", filename="y_position.jpg")
+    # plot_bb(positions=z_positions, freq=20.0, title="Z Positions", filename="z_position.jpg")
     return
 
 if __name__ == '__main__':
