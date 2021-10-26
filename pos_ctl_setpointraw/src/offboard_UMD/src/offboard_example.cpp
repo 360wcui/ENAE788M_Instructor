@@ -28,7 +28,7 @@ int main(int argc, char **argv)
     ros::NodeHandle nh;
 
     //ros::Subscriber state_sub = nh.subscribe<mavros_msgs::State>("mavros/state", 10, state_cb);
-    ros::Publisher local_pos_pub = nh.advertise<geometry_msgs::PoseStamped>("mavros/setpoint_position/local", 10);
+    //ros::Publisher local_pos_pub = nh.advertise<geometry_msgs::PoseStamped>("mavros/setpoint_position/local", 10);
     //ros::ServiceClient arming_client = nh.serviceClient<mavros_msgs::CommandBool>("mavros/cmd/arming");
     //ros::ServiceClient set_mode_client = nh.serviceClient<mavros_msgs::SetMode>("mavros/set_mode");
     ros::Publisher local_pos_pub_mavros = nh.advertise<mavros_msgs::PositionTarget>("mavros/setpoint_raw/local", 5);
@@ -41,11 +41,14 @@ int main(int argc, char **argv)
     //    ros::spinOnce();
     //    rate.sleep();
     //}
-
-    geometry_msgs::PoseStamped pose;
-    pose.pose.position.x = 0;
-    pose.pose.position.y = 0;
-    pose.pose.position.z = 2;
+    mavros_msgs::PositionTarget pose;
+    //geometry_msgs::PoseStamped pose;
+    pose.position.x = 0;
+    pose.position.y = 0;
+    pose.position.z = 1;
+    pose.type_mask = pose.IGNORE_VX | pose.IGNORE_VY | pose.IGNORE_VZ | pose.IGNORE_AFZ | pose.IGNORE_AFY | pose.IGNORE_AFX;
+    pose.coordinate_frame = 1;
+    pose.yaw = 3.141592/2;
 
     //send a few setpoints before starting
     //for(int i = 200; ros::ok() && i > 0; --i){
@@ -91,14 +94,14 @@ int main(int argc, char **argv)
         
 
         if (count<100){
-           pose.pose.position.x = -1.5;
-           pose.pose.position.y = 0;
-           pose.pose.position.z = 2;
+           pose.position.x = -0.5;
+           pose.position.y = 0;
+           pose.position.z = 1;
         }
         else if (count<200){
-           pose.pose.position.x = 1.5;
-           pose.pose.position.y = 0;
-           pose.pose.position.z = 2;
+           pose.position.x = 0.5;
+           pose.position.y = 0;
+           pose.position.z = 1;
         }
 	else{
 	count=0;
@@ -113,7 +116,7 @@ int main(int argc, char **argv)
     
         //local_pos_pub_mavros.publish(pose_vel);
 
-        local_pos_pub.publish(pose);
+        local_pos_pub_mavros.publish(pose);
 
         ros::spinOnce();
         rate.sleep();

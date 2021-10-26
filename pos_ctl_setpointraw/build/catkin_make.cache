@@ -1,0 +1,2 @@
+offboard_UMD
+-DCATKIN_DEVEL_PREFIX=/root/yoctohome/enae788m_f21/pos_ctl_setpointraw/devel -DCMAKE_INSTALL_PREFIX=/root/yoctohome/enae788m_f21/pos_ctl_setpointraw/install -G Unix Makefiles

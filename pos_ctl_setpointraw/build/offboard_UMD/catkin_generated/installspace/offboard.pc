@@ -1,0 +1,8 @@
+prefix=/root/yoctohome/enae788m_f21/pos_ctl_setpointraw/install
+
+Name: offboard
+Description: Description of offboard
+Version: 0.0.0
+Cflags: -I/opt/ros/kinetic/include -I/opt/ros/kinetic/share/xmlrpcpp/cmake/../../../include/xmlrpcpp -I/usr/include
+Libs: -L${prefix}/lib 
+Requires: roscpp sensor_msgs std_msgs
