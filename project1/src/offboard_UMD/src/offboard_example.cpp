@@ -75,6 +75,7 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "offb_node");
     ros::NodeHandle nh;
 
+<<<<<<< HEAD
     ros::Subscriber state_sub = nh.subscribe<mavros_msgs::State>
             ("mavros/state", 10, state_cb);
 
@@ -86,39 +87,60 @@ int main(int argc, char **argv)
             ("mavros/cmd/arming");
     ros::ServiceClient set_mode_client = nh.serviceClient<mavros_msgs::SetMode>
             ("mavros/set_mode");
+=======
+    //ros::Subscriber state_sub = nh.subscribe<mavros_msgs::State>("mavros/state", 10, state_cb);
+    ros::Publisher local_pos_pub = nh.advertise<geometry_msgs::PoseStamped>("mavros/setpoint_position/local", 10);
+    //ros::ServiceClient arming_client = nh.serviceClient<mavros_msgs::CommandBool>("mavros/cmd/arming");
+    //ros::ServiceClient set_mode_client = nh.serviceClient<mavros_msgs::SetMode>("mavros/set_mode");
+>>>>>>> 0c23a39cd5b7a0c982b850b678f00d99ac630a6d
     ros::Publisher local_pos_pub_mavros = nh.advertise<mavros_msgs::PositionTarget>("mavros/setpoint_raw/local", 5);
 
     //the setpoint publishing rate MUST be faster than 2Hz
     ros::Rate rate(FREQ);
 
     // wait for FCU connection
-    while(ros::ok() && !current_state.connected){
-        ros::spinOnce();
-        rate.sleep();
-    }
+    //while(ros::ok() && !current_state.connected){
+    //    ros::spinOnce();
+    //    rate.sleep();
+    //}
 
     geometry_msgs::PoseStamped pose;
     pose.pose.position.x = 0;
     pose.pose.position.y = 0;
+<<<<<<< HEAD
     pose.pose.position.z = 10;
 
     geometry_msgs::Point target0 = createTarget(0, 0, 10);
     geometry_msgs::Point target1 = createTarget(0, 10, 10);
     geometry_msgs::Point target2 = createTarget(0, 10, 25);
     geometry_msgs::Point target3 = createTarget(-5, 10, 25);
+=======
+    pose.pose.position.z = 2;
+>>>>>>> 0c23a39cd5b7a0c982b850b678f00d99ac630a6d
 
     //send a few setpoints before starting
-    for(int i = 200; ros::ok() && i > 0; --i){
-        local_pos_pub.publish(pose);
-        ros::spinOnce();
-        rate.sleep();
-    }
+    //for(int i = 200; ros::ok() && i > 0; --i){
+    //    local_pos_pub.publish(pose);
+    //    ros::spinOnce();
+    //    rate.sleep();
+    //}
 
+<<<<<<< HEAD
     mavros_msgs::SetMode offb_set_mode;
     offb_set_mode.request.custom_mode = "OFFBOARD";
+=======
 
-    mavros_msgs::CommandBool arm_cmd;
-    arm_cmd.request.value = true;
+   
+    //pose_vel.coordinate_frame = pose_vel.FRAME_LOCAL_NED;
+    //pose_vel.type_mask =  pose_vel.IGNORE_AFX | pose_vel.IGNORE_AFY | pose_vel.IGNORE_AFZ | pose_vel.FORCE | pose_vel.IGNORE_YAW | pose_vel.IGNORE_PX | pose_vel.IGNORE_PY | pose_vel.IGNORE_PZ;
+
+
+    //mavros_msgs::SetMode offb_set_mode;
+    //offb_set_mode.request.custom_mode = "OFFBOARD";
+>>>>>>> 0c23a39cd5b7a0c982b850b678f00d99ac630a6d
+
+    //mavros_msgs::CommandBool arm_cmd;
+    //arm_cmd.request.value = true;
 
     ros::Time last_request = ros::Time::now();
     ros::Time target_reached_time = ros::Time::now();
@@ -127,6 +149,7 @@ int main(int argc, char **argv)
     int count = 0;
     ROS_INFO("athena takes off");
     while(ros::ok()){
+<<<<<<< HEAD
         if( current_state.mode != "OFFBOARD" &&
             (ros::Time::now() - last_request > ros::Duration(1.0))){
             if( set_mode_client.call(offb_set_mode) &&
@@ -152,6 +175,36 @@ int main(int argc, char **argv)
 
         if (count == 1) {
             pose.pose.position = foo(current_pose.pose.position, target1, &count, &reachedTarget, &target_reached_time);
+=======
+        //if( current_state.mode != "OFFBOARD" &&
+        //    (ros::Time::now() - last_request > ros::Duration(5.0))){
+        //    if( set_mode_client.call(offb_set_mode) &&
+        //        offb_set_mode.response.mode_sent){
+        //        ROS_INFO("Offboard enabled");
+        //    }
+        //    last_request = ros::Time::now();
+        //} else {
+        //    if( !current_state.armed &&
+        //        (ros::Time::now() - last_request > ros::Duration(5.0))){
+        //        if( arming_client.call(arm_cmd) &&
+        //            arm_cmd.response.success){
+        //            ROS_INFO("Vehicle armed");
+        //        }
+        //       last_request = ros::Time::now();
+        //    }
+        //}
+        
+
+        if (count<100){
+           pose.pose.position.x = -1.5;
+           pose.pose.position.y = 0;
+           pose.pose.position.z = 2;
+        }
+        else if (count<200){
+           pose.pose.position.x = 1.5;
+           pose.pose.position.y = 0;
+           pose.pose.position.z = 2;
+>>>>>>> 0c23a39cd5b7a0c982b850b678f00d99ac630a6d
         }
 
         if (count == 2) {
@@ -166,6 +219,12 @@ int main(int argc, char **argv)
 
         ros::spinOnce();
         rate.sleep();
+<<<<<<< HEAD
+=======
+        count++;
+	std::cout << count << std::endl;
+
+>>>>>>> 0c23a39cd5b7a0c982b850b678f00d99ac630a6d
     }
 
     return 0;
